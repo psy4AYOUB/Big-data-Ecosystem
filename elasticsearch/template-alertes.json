@@ -1,0 +1,23 @@
+{
+  "index_patterns": ["securite-alertes-*"],
+  "priority": 200,
+  "template": {
+    "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+    "mappings": {
+      "properties": {
+        "alert_time":    { "type": "date" },
+        "jour":          { "type": "date" },
+        "fenetre_debut": { "type": "date" },
+        "fenetre_fin":   { "type": "date" },
+        "alert_id":      { "type": "keyword" },
+        "regle":         { "type": "keyword" },
+        "severite":      { "type": "keyword" },
+        "host":          { "type": "keyword" },
+        "utilisateur":   { "type": "keyword" },
+        "adresse_ip":    { "type": "ip", "ignore_malformed": true },
+        "nb_evenements": { "type": "integer" },
+        "description":   { "type": "text" }
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+# Filebeat (conteneur) : lit les logs Nginx (volume partage) et les logs SSH / UFW
+# de la machine SRV-LINUX (montes en lecture seule dans /hostlog).
+filebeat.inputs:
+  - type: filestream
+    id: nginx-access
+    paths:
+      - /var/log/labsecu-nginx/access.log
+    fields:
+      type_log: nginx_access
+      systeme: linux
+  - type: filestream
+    id: nginx-error
+    paths:
+      - /var/log/labsecu-nginx/error.log
+    fields:
+      type_log: nginx_error
+      systeme: linux
+  - type: filestream
+    id: auth
+    paths:
+      - /hostlog/auth.log
+    fields:
+      type_log: auth
+      systeme: linux
+  - type: filestream
+    id: ufw
+    paths:
+      - /hostlog/ufw.log
+    fields:
+      type_log: firewall
+      systeme: linux
+
+processors:
+  - add_host_metadata: ~
+
+output.logstash:
+  hosts: ["logstash:5044"]
+
+logging.level: info

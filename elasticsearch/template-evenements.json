@@ -1,0 +1,33 @@
+{
+  "index_patterns": ["securite-evenements-*"],
+  "priority": 200,
+  "template": {
+    "settings": { "number_of_shards": 1, "number_of_replicas": 0 },
+    "mappings": {
+      "properties": {
+        "timestamp":        { "type": "date" },
+        "event_time":       { "type": "date" },
+        "jour":             { "type": "date" },
+        "host":             { "type": "keyword" },
+        "source":           { "type": "keyword" },
+        "systeme":          { "type": "keyword" },
+        "type_evenement":   { "type": "keyword" },
+        "categorie":        { "type": "keyword" },
+        "utilisateur":      { "type": "keyword" },
+        "adresse_ip":       { "type": "ip", "ignore_malformed": true },
+        "message":          { "type": "text" },
+        "severite":         { "type": "keyword" },
+        "score_severite":   { "type": "integer" },
+        "est_echec":        { "type": "boolean" },
+        "event_id":         { "type": "keyword" },
+        "event_id_unique":  { "type": "keyword" },
+        "http_status":      { "type": "integer", "ignore_malformed": true },
+        "http_method":      { "type": "keyword" },
+        "http_url":         { "type": "keyword" },
+        "port_source":      { "type": "integer", "ignore_malformed": true },
+        "port_destination": { "type": "integer", "ignore_malformed": true },
+        "protocole":        { "type": "keyword" }
+      }
+    }
+  }
+}
