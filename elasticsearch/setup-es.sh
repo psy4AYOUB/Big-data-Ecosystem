@@ -21,7 +21,9 @@ until curl -s -u "$AUTH" "$ES/_cluster/health" | grep -qE '"status":"(green|yell
 
 appel POST "/_security/user/kibana_system/_password" -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
 
+# "monitor" : le connecteur elasticsearch-spark lit la version du cluster (cluster:monitor/main)
 appel PUT "/_security/role/spark_writer" -d '{
+  "cluster": ["monitor"],
   "indices": [ { "names": ["securite-*"],
                  "privileges": ["create_index", "auto_configure", "write", "create_doc", "index", "view_index_metadata"] } ]
 }'
