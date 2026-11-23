@@ -1,0 +1,53 @@
+# Construit les images du projet et les publie sur GitHub Container Registry (ghcr.io)
+#   ghcr.io/psy4ayoub/labsecu-spark:latest  (job Spark de detection)
+#   ghcr.io/psy4ayoub/labsecu-kali:latest   (conteneur d'attaque)
+# Les autres images (Elasticsearch, Kafka, Cassandra...) sont des images officielles publiques.
+name: Images Docker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "spark/**"
+      - "kali/**"
+      - ".github/workflows/images-docker.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  construire-et-publier:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - nom: labsecu-spark
+            dossier: ./spark
+          - nom: labsecu-kali
+            dossier: ./kali
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Nom du proprietaire en minuscules (exige par ghcr.io)
+        run: echo "PROPRIETAIRE=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_ENV"
+
+      - name: Connexion a ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construire et publier ${{ matrix.nom }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.dossier }}
+          push: true
+          build-args: |
+            SPARK_VERSION=3.5.8
+          tags: |
+            ghcr.io/${{ env.PROPRIETAIRE }}/${{ matrix.nom }}:latest
+            ghcr.io/${{ env.PROPRIETAIRE }}/${{ matrix.nom }}:${{ github.sha }}

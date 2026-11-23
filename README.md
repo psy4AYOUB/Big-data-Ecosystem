@@ -10,6 +10,30 @@ Windows AD (SRV-AD) ► Winlogbeat┘   (format     (topic     (4 règles)     �
                                      commun)     security-logs)
 ```
 
+## Ce qui est dans Docker, ce qui reste en VM
+
+| Ancienne VM | Dans Docker ? | Détail |
+|---|---|---|
+| SRV-LINUX | ✅ oui | 8 conteneurs : Nginx, Filebeat, Logstash, Kafka, Spark, Cassandra, Elasticsearch, Kibana |
+| KALI | ✅ oui | conteneur `labsecu-kali` (nmap, hydra, gobuster, netexec), lancé à la demande |
+| SRV-AD | ❌ non | un contrôleur de domaine Active Directory ne peut pas tourner dans un conteneur (même Windows) ; Samba AD ne produit pas les événements Windows 4625/4740/4771 utilisés par R1 et R4. SRV-AD reste une VM avec Winlogbeat. |
+
+## Images publiées (GitHub Container Registry)
+
+Construites et publiées automatiquement par GitHub Actions (`.github/workflows/images-docker.yml`) à chaque modification de `spark/` ou `kali/` :
+
+| Image | Contenu |
+|---|---|
+| `ghcr.io/psy4ayoub/labsecu-spark:latest` | job Spark de détection (règles R1 à R4) |
+| `ghcr.io/psy4ayoub/labsecu-kali:latest` | conteneur d'attaque + listes de test fictives |
+
+```bash
+docker pull ghcr.io/psy4ayoub/labsecu-spark:latest
+docker pull ghcr.io/psy4ayoub/labsecu-kali:latest
+```
+
+Les autres images (Elasticsearch, Kibana, Logstash, Filebeat, Kafka, Cassandra, Nginx) sont les images officielles publiques.
+
 ## Les machines
 
 | Machine | Adresse | Rôle |
@@ -51,7 +75,8 @@ cd Big-data-Ecosystem
 cp .env.example .env
 nano .env                          # changer les mots de passe
 ./scripts/preparer-hote.sh         # une seule fois : arrête les anciens services, règle vm.max_map_count
-docker compose up -d --build       # 3 à 5 minutes au premier lancement
+docker compose pull                # images officielles + images labsecu publiées sur ghcr.io
+docker compose up -d               # 3 à 5 minutes au premier lancement
 ./scripts/verifier.sh
 ```
 
@@ -69,7 +94,16 @@ Pour retrouver le tableau de bord « Supervision sécurité - labsecu » :
 
 Winlogbeat reste installé sur SRV-AD. Sa configuration est dans `winlogbeat/winlogbeat.yml` : il envoie à `srv-linux.labsecu.lan:5045`, le port publié par le conteneur Logstash. Rien à changer si Docker tourne sur SRV-LINUX.
 
-## Tester depuis KALI
+## Tester avec le conteneur Kali
+
+```bash
+docker compose run --rm kali scenario-labsecu      # lance A, B (R3), C (R2), E (R1) puis F (R4)
+docker compose run --rm kali                       # ou un terminal Kali pour taper les commandes soi-même
+```
+
+Le conteneur passe par SRV-LINUX : dans Kibana, l'IP source des attaques apparaît comme l'adresse du réseau Docker ou de SRV-LINUX, et non 192.168.50.100.
+
+## Tester depuis la VM KALI
 
 ```bash
 cd ~/labsecu; read -rs 'PW?Mot de passe des comptes de test : '; echo
@@ -114,6 +148,8 @@ cassandra/schema.cql    keyspace et 5 tables
 elasticsearch/          modèles d'index + comptes kibana_system / spark_es
 kibana/                 vues de données (+ dashboard.ndjson optionnel)
 spark/                  image et code du job (traitement, règles, écriture)
+kali/                   image du conteneur d attaque + listes fictives + scénario
+.github/workflows/      construction et publication des images sur ghcr.io
 scripts/                préparation de l'hôte et vérification
 ```
 

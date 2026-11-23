@@ -205,7 +205,7 @@ services:
       context: ./spark
       args:
         SPARK_VERSION: ${SPARK_VERSION}
-    image: labsecu/spark-securite:latest
+    image: ghcr.io/psy4ayoub/labsecu-spark:latest   # publiee par GitHub Actions
     container_name: labsecu-spark
     restart: unless-stopped
     environment:
@@ -230,6 +230,25 @@ services:
         condition: service_completed_successfully
       es-setup:
         condition: service_completed_successfully
+
+  # ---------------------------------------------------------------- attaquant
+  # Lance seulement a la demande :  docker compose run --rm kali scenario-labsecu
+  kali:
+    build:
+      context: ./kali
+    image: ghcr.io/psy4ayoub/labsecu-kali:latest      # publiee par GitHub Actions
+    container_name: labsecu-kali
+    hostname: kali
+    profiles: ["attaque"]
+    stdin_open: true
+    tty: true
+    dns:
+      - 192.168.50.10                   # DNS du domaine labsecu.lan (SRV-AD)
+    extra_hosts:
+      - "srv-linux:192.168.50.20"
+      - "srv-linux.labsecu.lan:192.168.50.20"
+      - "srv-ad:192.168.50.10"
+      - "srv-ad.labsecu.lan:192.168.50.10"
 
 volumes:
   nginx_logs:
