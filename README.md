@@ -150,7 +150,8 @@ kibana/                 vues de données (+ dashboard.ndjson optionnel)
 spark/                  image et code du job (traitement, règles, écriture)
 kali/                   image du conteneur d attaque + listes fictives + scénario
 .github/workflows/      construction et publication des images sur ghcr.io
-scripts/                préparation de l'hôte et vérification
+scripts/                préparation de l hôte et vérification
+docs/                   présentation et fiches du projet (pptx, docx)
 ```
 
 ## Sécurité et limites
