@@ -22,10 +22,11 @@ until curl -s -u "$AUTH" "$ES/_cluster/health" | grep -qE '"status":"(green|yell
 appel POST "/_security/user/kibana_system/_password" -d "{\"password\":\"${KIBANA_SYSTEM_PASSWORD}\"}"
 
 # "monitor" : le connecteur elasticsearch-spark lit la version du cluster (cluster:monitor/main)
+# "maintenance" : il rafraichit l index apres chaque ecriture (indices:admin/refresh)
 appel PUT "/_security/role/spark_writer" -d '{
   "cluster": ["monitor"],
   "indices": [ { "names": ["securite-*"],
-                 "privileges": ["create_index", "auto_configure", "write", "create_doc", "index", "view_index_metadata"] } ]
+                 "privileges": ["create_index", "auto_configure", "write", "create_doc", "index", "view_index_metadata", "maintenance"] } ]
 }'
 appel PUT "/_security/user/spark_es" -d "{\"password\":\"${SPARK_ES_PASSWORD}\",\"roles\":[\"spark_writer\"],\"full_name\":\"Compte Spark labsecu\"}"
 
