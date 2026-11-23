@@ -84,7 +84,7 @@ sleep 5; netexec smb 192.168.50.10 -d labsecu.lan -u alice.test -p "$PW"        
 Puis, 1 à 2 minutes plus tard :
 
 ```bash
-docker logs labsecu-spark 2>&1 | grep ALERTE | tail
+docker logs labsecu-spark 2>&1 | grep "\[ALERTE " | tail
 ```
 
 Et dans Kibana : *Discover → Alertes de sécurité*, filtre `regle : "R4_succes_apres_echecs"`.

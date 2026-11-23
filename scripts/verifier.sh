@@ -21,4 +21,4 @@ echo; echo "== Kibana =="
 curl -s -o /dev/null -w "HTTP %{http_code} (200 ou 401 = pret)\n" http://localhost:5601/api/status
 
 echo; echo "== Spark : dernieres alertes =="
-docker logs labsecu-spark 2>&1 | grep ALERTE | tail -n 10
+docker logs labsecu-spark 2>&1 | grep "\[ALERTE " | tail -n 10
